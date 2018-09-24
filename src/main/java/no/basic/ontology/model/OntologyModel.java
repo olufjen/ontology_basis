@@ -12,7 +12,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import no.basic.ontology.control.OntologyContainer;
 /*import no.basis.felles.semanticweb.chess.BlackBoardPosition;
 import no.basis.felles.semanticweb.chess.BlackPiece;
 import no.basis.felles.semanticweb.chess.ChessFactory;
@@ -33,16 +35,20 @@ import no.chess.ontology.WhitePiece;
 import org.protege.owl.codegeneration.inference.CodeGenerationInference;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLObjectRenderer;
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
+import org.semanticweb.owlapi.reasoner.InferenceType;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
 import org.semanticweb.owlapi.util.InferredAxiomGenerator;
+import org.semanticweb.owlapi.util.InferredEquivalentClassAxiomGenerator;
 import org.semanticweb.owlapi.util.InferredOntologyGenerator;
 import org.semanticweb.owlapi.util.InferredPropertyAssertionGenerator;
 import org.semanticweb.owlapi.vocab.PrefixOWLOntologyFormat;
@@ -92,12 +98,14 @@ import com.clarkparsia.pellet.owlapiv3.PelletReasonerFactory;
 //import org.swrlapi.sqwrl.exceptions.
 /* @author olj
  * This class reads and manipulates chosen ontology models
+ * It creates an ontology environment consisting of:
+ * 	An ontologly manager: OWLOntologyManager owlmanager
+ * 	The ontology: OWLOntology ontModel
+ * 	A Reasoner factory: OWLReasonerFactory owlReasonerFactory
+ * 	A reasoner: PelletReasoner clarkpelletReasoner
+ *  A data factory: OWLDataFactory owlDatafactory
+ *  A rule engine: SQWRLQueryEngine queryEngine
  * 
- * 
- */
-/**
- * @author bruker
- *
  */
 public class OntologyModel {
 	/**
@@ -133,10 +141,12 @@ public class OntologyModel {
 	private CodeGenerationInference owlInference;
 	private Map<String,BlackPiece> allBlackPieces;
 	private Map<String,WhitePiece> allWhitePieces;
-	private Reasoner reasoner;
+
 	private HashSet<Taken> allTakenPositions;
 	private HashSet<Vacant> allVacantPositions;
 	private HashSet<ChessPosition> allChessPositions;
+	private Set<OWLNamedIndividual> owlnamedIndividuals;
+	private Reasoner reasoner;
 	/**
 	 * Used with infModel and contains rules from separate rules file.
 	 */
@@ -144,6 +154,7 @@ public class OntologyModel {
 	private PelletReasoner clarkpelletReasoner;
 	private InferredOntologyGenerator iog = null;
 	private SQWRLQueryEngine queryEngine = null;
+	private OntologyContainer modelContainer;
 	/**
 	 * Contains ontology model with .hp.hpl.jena Reasoner General Rule reasoner with separate rules file
 	 * .hp.hpl.jena.rdf.model.InfModel
@@ -155,11 +166,9 @@ public class OntologyModel {
 		super();
 		owlmanager = OWLManager.createOWLOntologyManager();
 		this.model = fetchOntology();
-		chessFactory = new ChessFactory(ontModel);
-		owlInference = chessFactory.getInference();
-		owlReasonerFactory = PelletReasonerFactory.getInstance();
-		owlReasoner = owlReasonerFactory.createReasoner(ontModel, new SimpleConfiguration());
-//		owlReasoner = owlReasonerFactory.createReasoner(ontModel);
+//		owlReasonerFactory = PelletReasonerFactory.getInstance();
+//		owlReasoner = owlReasonerFactory.createReasoner(ontModel, new SimpleConfiguration());
+//		owlReasoner = owlReasonerFactory.createReasoner(ontModel); WE do not use the pellet reasoner OLJ 30.08.2018
 		owlDatafactory = owlmanager.getOWLDataFactory();
 /*		owlRenderer = new DLSyntaxObjectRenderer();
 		try {
@@ -174,23 +183,53 @@ public class OntologyModel {
 		clarkpelletReasoner.getKB().realize();
 		System.out.println("ClarckpelletReasoner on ontModel prepared "+clarkpelletReasoner.getReasonerName() );
 		
+//		owlReasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
+		clarkpelletReasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
+		
+		
+//		owlmanager.getOntologyDocumentIRI(ontModel);
+		IRI saveDocumentIRI = owlmanager.getOntologyDocumentIRI(ontModel);
+		System.out.println("Ontlogy information: IRI - saving to IRI: "+owlmanager.getOntologyDocumentIRI(ontModel)+" Format: "+owlmanager.getOntologyFormat(ontModel)+" No of axioms: "+ontModel.getAxiomCount());
 		List<InferredAxiomGenerator<? extends OWLAxiom>> axiomGenerators = new ArrayList<InferredAxiomGenerator<? extends OWLAxiom>>();
 	    axiomGenerators.add( new InferredPropertyAssertionGenerator() );
-//	    iog = new InferredOntologyGenerator(clarkpelletReasoner,axiomGenerators);
-//	    iog.fillOntology(owlmanager, ontModel);
+	    axiomGenerators.add(new InferredEquivalentClassAxiomGenerator());
+	    iog = new InferredOntologyGenerator(clarkpelletReasoner,axiomGenerators);
+	    iog.fillOntology(owlDatafactory, ontModel);
 	    queryEngine = SWRLAPIFactory.createSQWRLQueryEngine(ontModel);
-	    OutputStream owlOutputStream = new ByteArrayOutputStream();
+//	    OutputStream owlOutputStream = new ByteArrayOutputStream();
 	    try {
-			owlmanager.saveOntology(ontModel, owlOutputStream);
+		//	owlmanager.saveOntology(ontModel, owlOutputStream);
+			owlmanager.saveOntology(ontModel,saveDocumentIRI);
 		} catch (OWLOntologyStorageException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		chessFactory = new ChessFactory(ontModel);
+		owlInference = chessFactory.getInference();
+	    modelContainer = new OntologyContainer(ontModel);
+	    modelContainer.setChessFactory(chessFactory);
+	    modelContainer.setClarkpelletReasoner(clarkpelletReasoner);
 /*	    String inferredData = owlOutputStream.toString();	
 	    System.out.println(" Filled ontlogy "+inferredData);
 */
 		String format = "RDF/XML";
 
+	}
+
+	public OntologyContainer getModelContainer() {
+		return modelContainer;
+	}
+
+	public void setModelContainer(OntologyContainer modelContainer) {
+		this.modelContainer = modelContainer;
+	}
+
+	public Set<OWLNamedIndividual> getOwlnamedIndividuals() {
+		return owlnamedIndividuals;
+	}
+
+	public void setOwlnamedIndividuals(Set<OWLNamedIndividual> owlnamedIndividuals) {
+		this.owlnamedIndividuals = owlnamedIndividuals;
 	}
 
 	public SQWRLQueryEngine getQueryEngine() {
@@ -810,11 +849,13 @@ public class OntologyModel {
 	 /**
 	  * getIndividuals()
 	  * This method returns all individuals from the jena model
+	  * THese individuals are not used
 	 * @return List
 	 */
 	public List getIndividuals(){
 		 List allIndividuals = new ArrayList<Individual>();
 //		 System.out.println("Fetching individuals (model)");
+	
 		 ExtendedIterator iIndividuals = null;
 		 try {
 		  iIndividuals = model.listIndividuals();
@@ -828,6 +869,14 @@ public class OntologyModel {
 	      }
 	      return  allIndividuals;
 	 }
+	public void getOntindividuals() {
+		 owlnamedIndividuals = ontModel.getIndividualsInSignature();
+		for (OWLNamedIndividual ind : owlnamedIndividuals) {
+			
+		}
+		System.out.println("Ontologymodel: owl named individuals:");
+		owlnamedIndividuals.forEach(System.out::println);
+	}
 	 /**
 	  * getProperties
 	  * This method returns a HashMap containing all properties from all individuals in the jena model
