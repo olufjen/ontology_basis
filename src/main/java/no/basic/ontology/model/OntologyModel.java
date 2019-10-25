@@ -161,9 +161,65 @@ public class OntologyModel {
 	 */
 	private InfModel infModel; // Contains the model and rules
 	private ResultSet results = null; // Contains a resultset from querying the ontology
+	private String ontFile = null; // File selected to contain the ontology 
 	
+	public OntologyModel(String ontFile) {
+		super();
+		this.ontFile = ontFile;
+		owlmanager = OWLManager.createOWLOntologyManager();
+		this.model = fetchOntology();
+//		owlReasonerFactory = PelletReasonerFactory.getInstance();
+//		owlReasoner = owlReasonerFactory.createReasoner(ontModel, new SimpleConfiguration());
+//		owlReasoner = owlReasonerFactory.createReasoner(ontModel); WE do not use the pellet reasoner OLJ 30.08.2018
+		owlDatafactory = owlmanager.getOWLDataFactory();
+/*		owlRenderer = new DLSyntaxObjectRenderer();
+		try {
+			pm = (PrefixOWLOntologyFormat) owlmanager.getOntologyFormat(ontModel);
+		} catch (NoSuchMethodError nm) {
+			nm.printStackTrace();
+		}
+		if (pm != null)
+			pm.setDefaultPrefix(BASE_URL+"#");*/
+		System.out.println("Preparing clarckpelletReasoner on ontModel ");
+		clarkpelletReasoner = PelletReasonerFactory.getInstance().createReasoner(ontModel);
+		clarkpelletReasoner.getKB().realize();
+		System.out.println("ClarckpelletReasoner on ontModel prepared "+clarkpelletReasoner.getReasonerName() );
+		
+//		owlReasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
+		clarkpelletReasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
+		
+		
+//		owlmanager.getOntologyDocumentIRI(ontModel);
+		IRI saveDocumentIRI = owlmanager.getOntologyDocumentIRI(ontModel);
+		System.out.println("Ontlogy information: IRI - saving to IRI: "+owlmanager.getOntologyDocumentIRI(ontModel)+" Format: "+owlmanager.getOntologyFormat(ontModel)+" No of axioms: "+ontModel.getAxiomCount());
+		List<InferredAxiomGenerator<? extends OWLAxiom>> axiomGenerators = new ArrayList<InferredAxiomGenerator<? extends OWLAxiom>>();
+	    axiomGenerators.add( new InferredPropertyAssertionGenerator() );
+	    axiomGenerators.add(new InferredEquivalentClassAxiomGenerator());
+	    iog = new InferredOntologyGenerator(clarkpelletReasoner,axiomGenerators);
+	    iog.fillOntology(owlDatafactory, ontModel);
+	    queryEngine = SWRLAPIFactory.createSQWRLQueryEngine(ontModel);
+//	    OutputStream owlOutputStream = new ByteArrayOutputStream();
+	    try {
+		//	owlmanager.saveOntology(ontModel, owlOutputStream);
+			owlmanager.saveOntology(ontModel,saveDocumentIRI);
+		} catch (OWLOntologyStorageException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		chessFactory = new ChessFactory(ontModel);
+		owlInference = chessFactory.getInference();
+	    modelContainer = new OntologyContainer(ontModel);
+	    modelContainer.setChessFactory(chessFactory);
+	    modelContainer.setClarkpelletReasoner(clarkpelletReasoner);
+/*	    String inferredData = owlOutputStream.toString();	
+	    System.out.println(" Filled ontlogy "+inferredData);
+*/
+		String format = "RDF/XML";		
+	}
+
 	public OntologyModel() {
 		super();
+		this.ontFile = null;
 		owlmanager = OWLManager.createOWLOntologyManager();
 		this.model = fetchOntology();
 //		owlReasonerFactory = PelletReasonerFactory.getInstance();
@@ -486,18 +542,38 @@ public class OntologyModel {
 	public OntModel fetchOntology() {
 //	      String inputFileName = "C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\chess.owl";
 //	      String inputFileName = "C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\chess-rev01.owl";
-	      String inputFileName = "C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\chessnoimport.owl";
+		 String inputFileName = "";
+		 String reasoningLevel = "owl";
 	      String inputFileFormat = "RDF/XML";
-	      String reasoningLevel = "owl";//
-//	      File ontFile = new File("C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\chess.owl");
-//	      File ontFile = new File("C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\chess-rev01.owl");
-	      File ontFile = new File("C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\chessnoimport.owl");
-	      try {
-	    	  ontModel  = owlmanager.loadOntologyFromOntologyDocument(ontFile);
-		} catch (OWLOntologyCreationException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+	      File montFile = null;
+		if (this.ontFile == null) {
+		      inputFileName = "C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\chessnoimport.owl";
+	
+		      //
+//		      File ontFile = new File("C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\chess.owl");
+//		      File ontFile = new File("C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\chess-rev01.owl");
+		     montFile = new File("C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\chessnoimport.owl");
+		      try {
+		    	  ontModel  = owlmanager.loadOntologyFromOntologyDocument(montFile);
+			} catch (OWLOntologyCreationException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}else {
+		      inputFileName = this.ontFile;
+
+
+//		      File ontFile = new File("C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\chess.owl");
+//		      File ontFile = new File("C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\chess-rev01.owl");
+		     montFile = new File(this.ontFile);
+		      try {
+		    	  ontModel  = owlmanager.loadOntologyFromOntologyDocument(montFile);
+			} catch (OWLOntologyCreationException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		}
+
 	      // Create a SWRL rule engine using the SWRLAPI Dette biblioteket skaper problemer:
 // java.lang.IllegalAccessError: tried to access method com.google.common.collect.MapMaker.makeComputingMap(Lcom/google/common/base/Function;)Ljava/util/concurrent/ConcurrentMap; 	      
 /*	      SWRLRuleEngine swrlRuleEngine = SWRLAPIFactory.createSWRLRuleEngine(ontModel);
