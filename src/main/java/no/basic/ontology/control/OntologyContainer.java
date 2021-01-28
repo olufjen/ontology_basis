@@ -1,13 +1,18 @@
 package no.basic.ontology.control;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.protege.owl.codegeneration.inference.CodeGenerationInference;
+import org.restlet.Request;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -32,6 +37,10 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 
 import no.chess.ontology.BlackBoardPosition;
 import no.chess.ontology.BlackPiece;
@@ -42,6 +51,7 @@ import no.chess.ontology.Vacant;
 import no.chess.ontology.WhiteBoardPosition;
 import no.chess.ontology.WhitePiece;
 import no.chess.ontology.impl.DefaultTaken;
+
 
 /**
  * @author oluf
@@ -65,6 +75,7 @@ public class OntologyContainer {
 	private HashSet<Taken> allTakenPositions;
 	private HashSet<Vacant> allVacantPositions;
 	private HashSet<ChessPosition> allChessPositions;
+	private Set<OWLClass> allClasses;
 	private PelletReasoner clarkpelletReasoner;
 
 	public OntologyContainer(OWLOntology ontModel) {
@@ -97,6 +108,7 @@ public class OntologyContainer {
 			 takenEmpty = false;
 //			 allTakenPositions = new HashSet<Taken>();
 		 }
+		 allClasses =  ontModel.getClassesInSignature();
 		for (OWLClass c : ontModel.getClassesInSignature()) {
 		    if (c.getIRI().getFragment().equals("Taken")){
 		        NodeSet<OWLNamedIndividual> instances = clarkpelletReasoner.getInstances(c, false);
@@ -114,6 +126,17 @@ public class OntologyContainer {
 		}
 //		printIndividualsByclass(ontModel,"Class");
 
+	}
+	
+
+
+
+	public Set<OWLClass> getAllClasses() {
+		return allClasses;
+	}
+
+	public void setAllClasses(Set<OWLClass> allClasses) {
+		this.allClasses = allClasses;
 	}
 
 	public OWLOntology getOntModel() {
@@ -278,4 +301,5 @@ public class OntologyContainer {
 		    writer.close();
 
 		}
+
 }
