@@ -22,21 +22,31 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version> <!-- Use a recent version -->
+                <version>3.14.1</version> <!-- Use a recent version -->
 
-            <configuration>
+  <!--          <configuration>
                     <source>21</source>
                     <target>21</target>
-            </configuration>
+            </configuration>   -->
             </plugin>
         </plugins>
     </build>
-    
+    <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.3.0</version> <relativePath/>
+  </parent>
         <!-- Properties files  jena version prev: 3.0.0 olj 09.08.18 3.8.0 creates problems???!!  -->
     <!-- Properties files -->
     <properties>
-    <swrlapi.version>2.0.5</swrlapi.version>
-    <swrlapi.drools.version>2.0.5</swrlapi.drools.version>
+         <java.version>21</java.version>
+         <maven.compiler.source>21</maven.compiler.source>
+         <maven.compiler.target>21</maven.compiler.target>
+         <!-- new properties -->
+
+          <!-- new properties end  -->
+           <swrlapi.version>2.0.5</swrlapi.version>
+          <swrlapi.drools.version>2.0.5</swrlapi.drools.version>
 <!--       <java.version>1.8</java.version>   -->
          <jena.version>3.0.0</jena.version>
          <java-rdfa.version>0.4.2</java-rdfa.version>
@@ -47,7 +57,7 @@
         <org.springframework.version>3.1.1.RELEASE</org.springframework.version>
         <springwebflow.version>2.3.2.RELEASE</springwebflow.version>
          <springweboxm.version>3.1.1.RELEASE</springweboxm.version>
-              <restlet.version>3.0-M1</restlet.version>  <!-- New restlet version -->
+   <!--              <restlet.version>3.0-M1</restlet.version>  New restlet version Skal ikke brukes -->
  <!--         <basedirx>C:\Users\oluf\.m2\repository</basedirx>  -->
     </properties>
 
@@ -91,7 +101,7 @@
         </snapshots>  
      </repository>
      
-     <!-- Repository for Restlet -->
+     <!-- Repository for
      <repository>
      	<id>maven-restlet</id>
      	<name>Public online Restlet repository</name>
@@ -100,7 +110,7 @@
         <enabled>true</enabled>
         <updatePolicy>never</updatePolicy>
     </snapshots>
-      </repository>
+      </repository>        Restlet -->
       <repository>
             <releases>
                 <enabled>true</enabled>
@@ -110,7 +120,7 @@
             </snapshots>
             <id>apache-maven-snapshots</id>
             <url>http://people.apache.org/repo/m2-snapshot-repository</url>
-        </repository>
+      </repository>
 
         <repository>
             <id>java.net</id>
@@ -129,7 +139,10 @@
 
   
   <dependencies>
+  <!-- new dependencies -->
 
+
+  <!-- new dependencies end -->
     <dependency>
       <groupId>edu.stanford.swrl</groupId>
       <artifactId>swrlapi</artifactId>
@@ -157,7 +170,7 @@
                    </exclusion>
         </exclusions>
     </dependency>
-    
+
 <!-- https://mvnrepository.com/artifact/net.sourceforge.owlapi/owlapi-osgidistribution -->
      <dependency>
       <groupId>net.sourceforge.owlapi</groupId>
@@ -188,24 +201,24 @@
     <version>1.8.0-beta2</version>
     <scope>test</scope>
 </dependency>
-<!--     <dependency>
+<!--  restlet removed   <dependency>
     <groupId>org.restlet</groupId>
     <artifactId>org.restlet</artifactId>
     <version>${restlet-version}</version>
   </dependency>    -->
-<!-- https://mvnrepository.com/artifact/org.restlet/org.restlet  added 6.10.25-->
+<!-- https://mvnrepository.com/artifact/org.restlet/org.restlet
 <dependency>
     <groupId>org.restlet</groupId>
     <artifactId>org.restlet</artifactId>
-    <version>2.7.0-m2</version>            <!--  2.7.0-m2   -->
-</dependency>
+    <version>2.7.0-m2</version>
+</dependency>              ikke i bruk 14.11.25-->
 
 <!--  <dependency>
     <groupId>org.restlet</groupId>
     <artifactId>org.restlet.ext.jackson</artifactId>
     <version>${restlet-version}</version>
   </dependency>  -->
-<!-- https://mvnrepository.com/artifact/org.restlet/org.restlet.ext.jackson added 6.10.25 -->
+<!-- https://mvnrepository.com/artifact/org.restlet/org.restlet.ext.jackson
 <dependency>
     <groupId>org.restlet</groupId>
     <artifactId>org.restlet.ext.jackson</artifactId>
@@ -220,7 +233,7 @@
                     <artifactId>xml-apis</artifactId>
                     </exclusion>
          </exclusions>
-</dependency>
+</dependency>   ikke i bruk 14.11.25 -->
 <!-- <dependency>
     <groupId>org.restlet.jee</groupId>
     <artifactId>org.restlet.ext.freemarker</artifactId>

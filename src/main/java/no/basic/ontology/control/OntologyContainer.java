@@ -12,10 +12,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.protege.owl.codegeneration.inference.CodeGenerationInference;
-import org.restlet.Request;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
