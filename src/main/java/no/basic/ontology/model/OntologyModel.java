@@ -52,9 +52,12 @@ import org.semanticweb.owlapi.util.InferredEquivalentClassAxiomGenerator;
 import org.semanticweb.owlapi.util.InferredOntologyGenerator;
 import org.semanticweb.owlapi.util.InferredPropertyAssertionGenerator;
 import org.semanticweb.owlapi.vocab.PrefixOWLOntologyFormat;
-import org.swrlapi.factory.SWRLAPIFactory;
+//import org.swrlapi.factory.SWRLAPIFactory;
+//import org.swrlapi.sqwrl.SQWRLQueryEngine;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.swrlapi.core.SWRLRuleEngine;
 import org.swrlapi.sqwrl.SQWRLQueryEngine;
-
+import org.swrlapi.factory.SWRLAPIFactory;
 import com.hp.hpl.jena.ontology.ConversionException;
 /*import org.swrlapi.core.*;
 import org.swrlapi.factory.SWRLAPIFactory;
@@ -197,6 +200,8 @@ public class OntologyModel {
 	    axiomGenerators.add(new InferredEquivalentClassAxiomGenerator());
 	    iog = new InferredOntologyGenerator(clarkpelletReasoner,axiomGenerators);
 	    iog.fillOntology(owlDatafactory, ontModel);
+	    SWRLRuleEngine ruleEngine = SWRLAPIFactory.createSWRLRuleEngine(ontModel);
+//	    SQWRLQueryEngine queryEngine = ruleEngine.getSQWRLQueryEngine();
 	    queryEngine = SWRLAPIFactory.createSQWRLQueryEngine(ontModel);
 //	    OutputStream owlOutputStream = new ByteArrayOutputStream();
 	    try {
@@ -251,7 +256,7 @@ public class OntologyModel {
 	    axiomGenerators.add(new InferredEquivalentClassAxiomGenerator());
 	    iog = new InferredOntologyGenerator(clarkpelletReasoner,axiomGenerators);
 	    iog.fillOntology(owlDatafactory, ontModel);
-	    queryEngine = SWRLAPIFactory.createSQWRLQueryEngine(ontModel);
+//	    queryEngine = SWRLAPIFactory.createSQWRLQueryEngine(ontModel);
 //	    OutputStream owlOutputStream = new ByteArrayOutputStream();
 	    try {
 		//	owlmanager.saveOntology(ontModel, owlOutputStream);
@@ -288,13 +293,12 @@ public class OntologyModel {
 		this.owlnamedIndividuals = owlnamedIndividuals;
 	}
 
-	public SQWRLQueryEngine getQueryEngine() {
-		return queryEngine;
-	}
-
-	public void setQueryEngine(SQWRLQueryEngine queryEngine) {
-		this.queryEngine = queryEngine;
-	}
+	
+	  public SQWRLQueryEngine getQueryEngine() { return queryEngine; }
+	  
+	  public void setQueryEngine(SQWRLQueryEngine queryEngine) { this.queryEngine =
+	  queryEngine; }
+	 
 
 	public InferredOntologyGenerator getIog() {
 		return iog;
@@ -540,19 +544,19 @@ public class OntologyModel {
 	 * @return
 	 */
 	public OntModel fetchOntology() {
-//	      String inputFileName = "C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\chess.owl";
-//	      String inputFileName = "C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\chess-rev01.owl";
+//	      String inputFileName = "G:\\Min disk\\privat\\ontologies\\chess.owl";
+//	      String inputFileName = "G:\\Min disk\\privat\\ontologies\\chess-rev01.owl";
 		 String inputFileName = "";
 		 String reasoningLevel = "owl";
 	      String inputFileFormat = "RDF/XML";
 	      File montFile = null;
 		if (this.ontFile == null) {
-		      inputFileName = "C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\chessnoimport.owl";
+		      inputFileName = "G:\\Min disk\\privat\\ontologies\\chessnoimport.owl";
 	
 		      //
-//		      File ontFile = new File("C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\chess.owl");
-//		      File ontFile = new File("C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\chess-rev01.owl");
-		     montFile = new File("C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\chessnoimport.owl");
+//		      File ontFile = new File("G:\\Min disk\\privat\\ontologies\\chess.owl");
+//		      File ontFile = new File("G:\\Min disk\\privat\\ontologies\\chess-rev01.owl");
+		     montFile = new File("G:\\Min disk\\privat\\ontologies\\chessnoimport.owl");
 		      try {
 		    	  ontModel  = owlmanager.loadOntologyFromOntologyDocument(montFile);
 			} catch (OWLOntologyCreationException e1) {
@@ -639,7 +643,7 @@ public class OntologyModel {
 	    	  Model defaultModel = ModelFactory.createDefaultModel();
 	          Resource configuration  = defaultModel.createResource();
 //		         configuration.addProperty(ReasonerVocabulary.PROPruleMode, "hybrid");
-		         configuration.addProperty(ReasonerVocabulary.PROPruleSet, "C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\rules.txt");
+		         configuration.addProperty(ReasonerVocabulary.PROPruleSet, "G:\\Min disk\\privat\\ontologies\\rules.txt");
 		         configuration.addProperty(ReasonerVocabulary.PROPruleMode,"backward");
 /*	         reasoner = 
 	        		 org.mindswap.pellet.jena.PelletReasonerFactory.theInstance().create(configuration);*/
@@ -656,7 +660,7 @@ public class OntologyModel {
 	         defaultModel.read(defaultModelStream, null, inputFileFormat);
 	         
 	
-	         List<Rule> rules = Rule.rulesFromURL("C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\rules.txt");
+	         List<Rule> rules = Rule.rulesFromURL("G:\\Min disk\\privat\\ontologies\\rules.txt");
 	         
 	         genRulereasoner = (GenericRuleReasoner) GenericRuleReasonerFactory.theInstance().create(configuration);
 	         genRulereasoner.setRules(rules);
@@ -702,7 +706,7 @@ public class OntologyModel {
 	 }
 	public void printOntology(){
 		PrintWriter writer = null;
-	    String outputFileName = "C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\individuals.txt";
+	    String outputFileName = "G:\\Min disk\\privat\\ontologies\\individuals.txt";
 	      //create an output print writer for the results
 	      try 
 	      {
@@ -790,7 +794,7 @@ public class OntologyModel {
 		   }
 	 public void printStatements(){
 			PrintWriter writer = null;
-		    String outputFileName = "C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\statements.txt";
+		    String outputFileName = "G:\\Min disk\\privat\\ontologies\\statements.txt";
 		      //create an output print writer for the results
 		      try 
 		      {
@@ -818,11 +822,11 @@ public class OntologyModel {
 		    infModel.close();
 	 }
 	 public void fetchandprintOntology(){
-//	      String inputFileName = "C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\chess.owl";
-//	      String inputFileName = "C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\chess-rev01.owl";
-	      String inputFileName = "C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\chessnoimport.owl";
+//	      String inputFileName = "G:\\Min disk\\privat\\ontologies\\chess.owl";
+//	      String inputFileName = "G:\\Min disk\\privat\\ontologies\\chess-rev01.owl";
+	      String inputFileName = "G:\\Min disk\\privat\\ontologies\\chessnoimport.owl";
 	      String inputFileFormat = "RDF/XML";
-	      String outputFileName = "C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\individuals.txt";
+	      String outputFileName = "G:\\Min disk\\privat\\ontologies\\individuals.txt";
 	      String reasoningLevel = "none";
 
 	      //create an input stream for the input file

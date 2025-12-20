@@ -9,13 +9,18 @@
     <url></url>
 
   <description>Classes and packages to access chosen ontology</description>
-  <scm>
+<!--  <scm>
     <connection>scm:git:git@github.com:protegeproject/swrlapi-example.git</connection>
     <developerConnection>scm:git:git@github.com:protegeproject/swrlapi-example.git</developerConnection>
     <url>https://github.com/protegeproject/swrlapi-example</url>
     <tag>release-2.0.5</tag>
-  </scm>
-
+  </scm>   -->
+ <scm>
+    <connection>scm:git:git@github.com:protegeproject/swrlapi-example.git</connection>
+    <developerConnection>scm:git:git@github.com:protegeproject/swrlapi-example.git</developerConnection>
+    <url>https://github.com/protegeproject/swrlapi-example</url>
+    <tag>release-2.1.3</tag>
+ </scm>
     <build>
          <finalName>ontology_basis</finalName>
         <plugins>
@@ -45,8 +50,10 @@
          <!-- new properties -->
 
           <!-- new properties end  -->
-           <swrlapi.version>2.0.5</swrlapi.version>
-          <swrlapi.drools.version>2.0.5</swrlapi.drools.version>
+           <swrlapi.version>2.1.3</swrlapi.version>
+          <swrlapi.drools.version>2.1.3</swrlapi.drools.version> <!-- Fra 2.0.5 -->
+          <drools.version>7.74.1.Final</drools.version>
+
 <!--       <java.version>1.8</java.version>   -->
          <jena.version>3.0.0</jena.version>
          <java-rdfa.version>0.4.2</java-rdfa.version>
@@ -100,7 +107,27 @@
         <updatePolicy>never</updatePolicy>
         </snapshots>  
      </repository>
-     
+    <repository>
+        <id>oss.sonatype.org-releases</id>
+        <name>OSS Sonatype Releases</name>
+        <url>https://oss.sonatype.org/content/repositories/releases/</url>
+    </repository>
+    <repository>
+        <id>protege.stanford.edu-repo-legacy</id>
+        <name>Stanford Protege Repository Legacy</name>
+        <url>https://smi-protege.stanford.edu/maven/full/</url>
+    </repository>
+        <repository>
+        <id>protege-stanford-edu</id>
+        <name>Stanford Protege Repository</name>
+        <url>https://repo.protege.stanford.edu/maven-snapshots/release</url>
+        <releases>
+            <enabled>true</enabled>
+        </releases>
+        <snapshots>
+            <enabled>false</enabled>
+        </snapshots>
+    </repository>
      <!-- Repository for
      <repository>
      	<id>maven-restlet</id>
@@ -136,10 +163,75 @@
         </repository>
 
   </repositories>
-
+ <dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>net.sourceforge.owlapi</groupId>
+            <artifactId>owlapi-api</artifactId>
+            <version>4.5.20</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.owlapi</groupId>
+            <artifactId>owlapi-distribution</artifactId>
+            <version>4.5.20</version>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-mvel</artifactId>
+            <version>${drools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kie.soup</groupId>
+            <artifactId>kie-soup-project-datamodel-commons</artifactId>
+            <version>${drools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kie.soup</groupId>
+            <artifactId>kie-soup-commons</artifactId>
+            <version>${drools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kie.soup</groupId>
+            <artifactId>kie-soup-project-datamodel-api</artifactId>
+            <version>${drools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-core</artifactId>
+            <version>${drools.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.kie</groupId>
+            <artifactId>kie-api</artifactId>
+            <version>${drools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-compiler</artifactId>
+            <version>${drools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kie</groupId>
+            <artifactId>kie-internal</artifactId>
+            <version>${drools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>knowledge-api</artifactId>
+            <version>${drools.version}</version> 
+        </dependency>
+<!--        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-reteoo</artifactId>
+            <version>${drools.version}</version>
+        </dependency>       -->
+    </dependencies>
+</dependencyManagement>
   
   <dependencies>
   <!-- new dependencies -->
+
 
 
   <!-- new dependencies end -->
@@ -147,11 +239,15 @@
       <groupId>edu.stanford.swrl</groupId>
       <artifactId>swrlapi</artifactId>
       <version>${swrlapi.version}</version>
-                  <exclusions>      <!--  -->
+        <exclusions>      <!--  -->
                    <exclusion>
                        <groupId>org.checkerframework</groupId>
                        <artifactId>jdk8</artifactId>
                    </exclusion>
+                  <exclusion>
+                      <groupId>net.sourceforge.owlapi</groupId>
+                      <artifactId>owlapi-osgidistribution</artifactId>
+                  </exclusion>
         </exclusions>
     </dependency>
 
@@ -159,7 +255,69 @@
       <groupId>edu.stanford.swrl</groupId>
       <artifactId>swrlapi-drools-engine</artifactId>
       <version>${swrlapi.drools.version}</version>
-              <exclusions>      <!--  -->
+      <exclusions>
+ <!--                <exclusion>
+                      <groupId>org.drools</groupId>
+                      <artifactId>drools-compiler</artifactId>
+                    </exclusion> 
+                    <exclusion>
+                               <groupId>org.drools</groupId>
+                               <artifactId>drools-osgi-integration</artifactId>
+                    </exclusion>
+                    <exclusion>
+                               <groupId>org.kie</groupId>
+                               <artifactId>kie-spring</artifactId>
+                   </exclusion>
+                   <exclusion>
+                              <groupId>org.drools</groupId>
+                              <artifactId>drools-core</artifactId>
+                   </exclusion>
+                   <exclusion>
+                              <groupId>org.drools</groupId>
+                              <artifactId>knowledge-api</artifactId>
+                   </exclusion>
+                   <exclusion>
+                              <groupId>org.drools</groupId>
+                              <artifactId>drools-reteoo</artifactId>
+                   </exclusion>
+      -->
+                  <exclusion>
+                      <groupId>org.kie.soup</groupId>
+                      <artifactId>kie-soup-project-datamodel-commons</artifactId>
+                  </exclusion>
+                  <exclusion>
+                      <groupId>org.kie.soup</groupId>
+                      <artifactId>kie-soup-commons</artifactId>
+                  </exclusion>
+                  <exclusion>
+                      <groupId>org.kie.soup</groupId>
+                      <artifactId>kie-soup-project-datamodel-api</artifactId>
+                  </exclusion>
+                 <exclusion>
+                      <groupId>org.drools</groupId>
+                      <artifactId>drools-mvel</artifactId>
+                  </exclusion>
+                  <exclusion>
+                      <groupId>org.kie.soup</groupId>
+                      <artifactId>kie-soup-project-datamodel-commons</artifactId>
+                  </exclusion>
+                  <exclusion>
+                      <groupId>org.kie.soup</groupId>
+                      <artifactId>kie-soup-commons</artifactId>
+                  </exclusion>
+                  <exclusion>
+                      <groupId>org.kie.soup</groupId>
+                      <artifactId>kie-soup-project-datamodel-api</artifactId>
+                  </exclusion>
+
+                   <exclusion>
+                      <groupId>net.sourceforge.owlapi</groupId>
+                      <artifactId>owlapi-osgidistribution</artifactId>
+                  </exclusion>
+                  <exclusion>
+                      <groupId>net.sourceforge.owlapi</groupId>
+                      <artifactId>owlapi-parent</artifactId>
+                  </exclusion>
                    <exclusion>
                        <groupId>xpp3</groupId>
                        <artifactId>xpp3_min</artifactId>
@@ -168,9 +326,51 @@
                        <groupId>org.checkerframework</groupId>
                        <artifactId>jdk8</artifactId>
                    </exclusion>
+                   <exclusion>
+                       <groupId>org.springframework.osgi</groupId>
+                       <artifactId>spring-osgi-core</artifactId>
+                   </exclusion>
         </exclusions>
     </dependency>
+    <dependency>
+        <groupId>net.sourceforge.owlapi</groupId>
+        <artifactId>owlapi-api</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>net.sourceforge.owlapi</groupId>
+        <artifactId>owlapi-distribution</artifactId>
+    </dependency>
 
+ <!--    <dependency>
+        <groupId>org.drools</groupId>
+        <artifactId>drools-core</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.drools</groupId>
+        <artifactId>drools-compiler</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-api</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.drools</groupId>
+        <artifactId>drools-reteoo</artifactId>
+    </dependency>       -->
+         <dependency>
+            <groupId>net.sourceforge.owlapi</groupId>
+            <artifactId>owlapi-api</artifactId>
+            <version>4.5.20</version>
+        </dependency>
+     <dependency>
+        <groupId>org.drools</groupId>
+        <artifactId>drools-mvel</artifactId>
+        <scope>compile</scope>
+    </dependency>
+<!--    <dependency>
+        <groupId>org.kie.soup</groupId>
+        <artifactId>kie-soup-project-datamodel-commons</artifactId>
+    </dependency>       -->
 <!-- https://mvnrepository.com/artifact/net.sourceforge.owlapi/owlapi-osgidistribution -->
      <dependency>
       <groupId>net.sourceforge.owlapi</groupId>
