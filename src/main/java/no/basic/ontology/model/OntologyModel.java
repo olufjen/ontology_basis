@@ -200,9 +200,9 @@ public class OntologyModel {
 	    axiomGenerators.add(new InferredEquivalentClassAxiomGenerator());
 	    iog = new InferredOntologyGenerator(clarkpelletReasoner,axiomGenerators);
 	    iog.fillOntology(owlDatafactory, ontModel);
-	    SWRLRuleEngine ruleEngine = SWRLAPIFactory.createSWRLRuleEngine(ontModel);
+//	    SWRLRuleEngine ruleEngine = SWRLAPIFactory.createSWRLRuleEngine(ontModel);
 //	    SQWRLQueryEngine queryEngine = ruleEngine.getSQWRLQueryEngine();
-	    queryEngine = SWRLAPIFactory.createSQWRLQueryEngine(ontModel);
+//	    queryEngine = SWRLAPIFactory.createSQWRLQueryEngine(ontModel);
 //	    OutputStream owlOutputStream = new ByteArrayOutputStream();
 	    try {
 		//	owlmanager.saveOntology(ontModel, owlOutputStream);
@@ -564,12 +564,12 @@ public class OntologyModel {
 				e1.printStackTrace();
 			}
 		}else {
-		      inputFileName = this.ontFile;
+//		      inputFileName = this.ontFile;
 
 
 //		      File ontFile = new File("C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\chess.owl");
 //		      File ontFile = new File("C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\chess-rev01.owl");
-		     montFile = new File(this.ontFile);
+		     montFile = new File(inputFileName = "G:\\Min disk\\privat\\ontologies\\chessnoimport.owl");
 		      try {
 		    	  ontModel  = owlmanager.loadOntologyFromOntologyDocument(montFile);
 			} catch (OWLOntologyCreationException e1) {

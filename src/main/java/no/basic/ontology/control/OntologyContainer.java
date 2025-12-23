@@ -236,7 +236,7 @@ public class OntologyContainer {
 	}
 	public void printOntology(){
 		PrintWriter writer = null;
-	    String outputFileName = "C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\logicalaxioms.txt";
+	    String outputFileName = "G:\\Min disk\\privat\\ontologies\\logicalaxioms.txt";
 	      //create an output print writer for the results
 	      try 
 	      {
@@ -256,7 +256,7 @@ public class OntologyContainer {
 
 	 public void printStatements(){
 			PrintWriter writer = null;
-		    String outputFileName = "C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\axioms.txt";
+		    String outputFileName = "G:\\Min disk\\privat\\ontologies\\axioms.txt";
 		      //create an output print writer for the results
 		      try 
 		      {
@@ -275,7 +275,7 @@ public class OntologyContainer {
 	 }
 	 private void printIndividualsByclass(OWLOntology ontology, String owlClass){
 			PrintWriter writer = null;
-		    String outputFileName = "C:\\Users\\bruker\\Google Drive\\privat\\ontologies\\indiviualsbyclass.txt";
+		    String outputFileName = "G:\\Min disk\\privat\\ontologies\\indiviualsbyclass.txt";
 		      //create an output print writer for the results
 		      try 
 		      {
